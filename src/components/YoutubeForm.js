@@ -1,91 +1,99 @@
+// using Formik component .....
 import React from "react";
-import { Formik, useFormik } from "formik";
-
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import TextError from "./TextError";
 const initialValues = {
   name: "",
   email: "",
   channel: "",
+  comments: "",
+  address: "",
+  social: {
+    facebook: "",
+    twitter: "",
+  },
+  phoneNumber: ["", ""],
 };
 
 const onSubmit = (values) => {
-  console.log(values);
+  console.log("Form Data", values);
 };
 
-const validate = (values) => {
-  let errors = {};
-  if (!values.name) {
-    errors.name = "Required";
-  }
-
-  if (!values.email) {
-    errors.email = "Required";
-  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-    errors.email = "Invalid email format!";
-  }
-
-  if (!values.channel) {
-    errors.channel = "Required";
-  }
-  return errors;
-};
-
+const validationSchema = Yup.object({
+  name: Yup.string().required("Required field!"),
+  email: Yup.string().email("Invalid email format").required("Required Field!"),
+  channel: Yup.string().required("Channel is a required field"),
+});
 function YoutubeForm() {
-  const formik = useFormik({
-    initialValues,
-    onSubmit,
-    validate,
-  });
-
-  console.log("visited fields", formik.touched);
-  //console.log("form errors:", formik.errors);
   return (
-    <div>
-      <form onSubmit={formik.handleSubmit}>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={onSubmit}
+    >
+      <Form>
         <div className="form-control">
           <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.name}
-          />
-          {formik.touched.name && formik.errors.name ? (
-            <div className="error">{formik.errors.name}</div>
-          ) : null}
+          <Field type="text" id="name" name="name" />
+          <ErrorMessage name="name" component={TextError} />
         </div>
         <div className="form-control">
           <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.email}
-          />
-          {formik.touched.email && formik.errors.email ? (
-            <div className="error">{formik.errors.email}</div>
-          ) : null}
+          <Field type="email" id="email" name="email" />
+          <ErrorMessage name="email">
+            {(errorMsg) => <div className="error">{errorMsg}</div>}
+          </ErrorMessage>
         </div>
         <div className="form-control">
           <label htmlFor="channel">Channel</label>
-          <input
+          <Field
             type="text"
             id="channel"
             name="channel"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.channel}
+            placeholder="YouTube channel name"
           />
-          {formik.touched.channel && formik.errors.channel ? (
-            <div className="error">{formik.errors.channel}</div>
-          ) : null}
+          <ErrorMessage name="channel" />
         </div>
+        <div className="form-control">
+          <label htmlFor="comments">Comments</label>
+          <Field as="textarea" id="comments" name="comments" />
+        </div>
+        <div className="form-control">
+          <label htmlFor="address">Address</label>
+          <Field name="address">
+            {(props) => {
+              const { field, form, meta } = props;
+              //console.log("render props", props);
+              return (
+                <div>
+                  <input type="text" id="address" {...field} />
+                  {meta.touched && meta.error ? <div>{meta.error}</div> : null}
+                </div>
+              );
+            }}
+          </Field>
+        </div>
+        <div className="form-control">
+          <label htmlFor="facebook">Facebook</label>
+          <Field type="text" id="facebook" name="social.facebook" />
+        </div>
+        <div className="form-control">
+          <label htmlFor="twitter">Twitter</label>
+          <Field type="text" id="twitter" name="social.twitter" />
+        </div>
+        <div className="form-control">
+          <label htmlFor="twitter">Phone Number 1</label>
+          <Field type="text" id="phoneNumber1" name="phoneNumber[0]" />
+        </div>
+        <div className="form-control">
+          <label htmlFor="twitter">Phone Number 2</label>
+          <Field type="text" id="phoneNumber2" name="phoneNumber[1]" />
+        </div>
+
         <button type="submit">Submit</button>
-      </form>
-    </div>
+      </Form>
+    </Formik>
   );
 }
 
