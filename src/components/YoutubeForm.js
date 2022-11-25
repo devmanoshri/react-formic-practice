@@ -1,6 +1,6 @@
 // using Formik component .....
 import React from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
 import TextError from "./TextError";
 const initialValues = {
@@ -13,7 +13,8 @@ const initialValues = {
     facebook: "",
     twitter: "",
   },
-  phoneNumber: ["", ""],
+  phoneNumbers: ["", ""],
+  phNumbers: [""],
 };
 
 const onSubmit = (values) => {
@@ -63,7 +64,7 @@ function YoutubeForm() {
           <label htmlFor="address">Address</label>
           <Field name="address">
             {(props) => {
-              const { field, form, meta } = props;
+              const { field, meta } = props;
               //console.log("render props", props);
               return (
                 <div>
@@ -84,11 +85,42 @@ function YoutubeForm() {
         </div>
         <div className="form-control">
           <label htmlFor="twitter">Phone Number 1</label>
-          <Field type="text" id="phoneNumber1" name="phoneNumber[0]" />
+          <Field type="text" id="phoneNumber1" name="phoneNumbers[0]" />
         </div>
         <div className="form-control">
           <label htmlFor="twitter">Phone Number 2</label>
-          <Field type="text" id="phoneNumber2" name="phoneNumber[1]" />
+          <Field type="text" id="phoneNumber2" name="phoneNumbers[1]" />
+        </div>
+        <div className="form-control">
+          <label>List of Phone Numbers</label>
+          <FieldArray name="phNumbers">
+            {(fieldArrayProps) => {
+              console.log(fieldArrayProps);
+              const { push, remove, form } = fieldArrayProps;
+              const { values } = form;
+              const { phNumbers } = values;
+              return (
+                <div>
+                  {phNumbers.map((phNumber, index) => (
+                    <div key={index}>
+                      <Field name={`phNumbers[${index}]`} />
+                      <button type="button" onClick={() => push("")}>
+                        +
+                      </button>
+                      {index > 0 && (
+                        <button
+                          type="button"
+                          onClick={(index) => remove(index)}
+                        >
+                          -
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            }}
+          </FieldArray>
         </div>
 
         <button type="submit">Submit</button>
