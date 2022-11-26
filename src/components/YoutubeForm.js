@@ -15,6 +15,7 @@ const initialValues = {
   },
   phoneNumbers: ["", ""],
   phNumbers: [""],
+  comments: "",
 };
 
 const onSubmit = (values) => {
@@ -25,7 +26,16 @@ const validationSchema = Yup.object({
   name: Yup.string().required("Required field!"),
   email: Yup.string().email("Invalid email format").required("Required Field!"),
   channel: Yup.string().required("Channel is a required field"),
+  comments: Yup.string().required("Comments Required!"),
 });
+
+const validateComments = (value) => {
+  let error;
+  if (!value) {
+    error = "required";
+  }
+  return error;
+};
 function YoutubeForm() {
   return (
     <Formik
@@ -58,7 +68,13 @@ function YoutubeForm() {
         </div>
         <div className="form-control">
           <label htmlFor="comments">Comments</label>
-          <Field as="textarea" id="comments" name="comments" />
+          <Field
+            as="textarea"
+            id="comments"
+            name="comments"
+            validate={validateComments}
+          />
+          <ErrorMessage name="comments" component={TextError} />
         </div>
         <div className="form-control">
           <label htmlFor="address">Address</label>
@@ -95,7 +111,7 @@ function YoutubeForm() {
           <label>List of Phone Numbers</label>
           <FieldArray name="phNumbers">
             {(fieldArrayProps) => {
-              console.log(fieldArrayProps);
+              // console.log(fieldArrayProps);
               const { push, remove, form } = fieldArrayProps;
               const { values } = form;
               const { phNumbers } = values;
